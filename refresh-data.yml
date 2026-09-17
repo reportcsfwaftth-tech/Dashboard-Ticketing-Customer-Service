@@ -1,0 +1,46 @@
+name: Refresh dashboard data
+
+# Pulls the latest export of the Google Sheet, re-cleans it, and commits the
+# refreshed data/bundle.json — which is what index.html fetches at load
+# time. GitHub Pages redeploys automatically whenever main changes.
+
+on:
+  schedule:
+    # Every 6 hours. Edit this cron to change the cadence.
+    # (Uses UTC. https://crontab.guru helps if you want a different schedule.)
+    - cron: "0 */6 * * *"
+  workflow_dispatch: {}   # adds a "Run workflow" button on the Actions tab
+  push:
+    paths:
+      - "scripts/refresh_data.py"   # re-run automatically if you edit the script
+
+permissions:
+  contents: write   # needed so the workflow can commit data/bundle.json back
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run refresh script
+        env:
+          SOURCE_CSV_URL: ${{ vars.SOURCE_CSV_URL }}
+        run: python3 scripts/refresh_data.py
+
+      - name: Commit data/bundle.json if it changed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: refresh dashboard data"
+          file_pattern: data/bundle.json
+          commit_user_name: "cs-dashboard-bot"
+          commit_user_email: "actions@users.noreply.github.com"
