@@ -1,0 +1,1267 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar Layanan CS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f5f2;
+    --surface:#ffffff;
+    --surface-2:#fbfaf7;
+    --border:#e3e1da;
+    --border-soft:#ececE7;
+    --text-primary:#1b1c1a;
+    --text-secondary:#5c5d57;
+    --text-muted:#8b8c85;
+    --accent:#2d3557;
+    --accent-ink:#ffffff;
+    --accent-soft:#e8eaf2;
+    --c-starlite:#2a78d6;
+    --c-viberlink:#1baf7a;
+    --c-ira:#eb6834;
+    --good:#0ca30c;
+    --warn:#fab219;
+    --crit:#d03b3b;
+    --good-text:#006300;
+    --warn-text:#7a4c00;
+    --crit-text:#a32020;
+    --grid-line:#e6e4dd;
+    --focus:#2a78d6;
+    --shadow: 0 1px 2px rgba(20,20,15,.04), 0 4px 14px rgba(20,20,15,.05);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#15161a;
+      --surface:#1d1f24;
+      --surface-2:#22242a;
+      --border:#33353c;
+      --border-soft:#2a2c32;
+      --text-primary:#f1f1ee;
+      --text-secondary:#b5b6b0;
+      --text-muted:#84867f;
+      --accent:#8b96c9;
+      --accent-ink:#12141a;
+      --accent-soft:#262b41;
+      --c-starlite:#3987e5;
+      --c-viberlink:#199e70;
+      --c-ira:#d95926;
+      --good:#0ca30c;
+      --warn:#fab219;
+      --crit:#d03b3b;
+      --good-text:#3fc23f;
+      --warn-text:#fab219;
+      --crit-text:#e66767;
+      --grid-line:#2e3038;
+      --focus:#3987e5;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.35);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#15161a;
+    --surface:#1d1f24;
+    --surface-2:#22242a;
+    --border:#33353c;
+    --border-soft:#2a2c32;
+    --text-primary:#f1f1ee;
+    --text-secondary:#b5b6b0;
+    --text-muted:#84867f;
+    --accent:#8b96c9;
+    --accent-ink:#12141a;
+    --accent-soft:#262b41;
+    --c-starlite:#3987e5;
+    --c-viberlink:#199e70;
+    --c-ira:#d95926;
+    --good:#0ca30c;
+    --warn:#fab219;
+    --crit:#d03b3b;
+    --good-text:#3fc23f;
+    --warn-text:#fab219;
+    --crit-text:#e66767;
+    --grid-line:#2e3038;
+    --focus:#3987e5;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text-primary);}
+  .app{
+    font-family:"IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    max-width:1320px;
+    margin:0 auto;
+    padding-inline:20px;
+    padding-block:18px 40px;
+  }
+  h1,h2,h3{font-family:"Manrope", system-ui, sans-serif; text-wrap:balance; margin:0;}
+  .tabular{font-variant-numeric:tabular-nums;}
+
+  .topbar{
+    display:flex; flex-wrap:wrap; gap:12px 24px; align-items:flex-end; justify-content:space-between;
+    padding-block:4px 18px;
+  }
+  .topbar h1{font-size:26px; font-weight:800; color:var(--text-primary); letter-spacing:-.01em;}
+  .topbar .eyebrow{
+    font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:6px; display:block;
+  }
+  .topbar .sub{color:var(--text-secondary); font-size:13.5px; max-width:640px; line-height:1.5;}
+  .topbar .meta{font-size:12px; color:var(--text-muted); text-align:right;}
+
+  .filterbar{
+    position:sticky; top:env(safe-area-inset-top,0px);
+    z-index:40;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:12px 14px;
+    display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center;
+    box-shadow:var(--shadow);
+    margin-bottom:20px;
+  }
+  .fgroup{display:flex; flex-direction:column; gap:4px;}
+  .fgroup label.flabel{font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted);}
+  .chiprow{display:flex; gap:6px; flex-wrap:wrap;}
+  .chip{
+    border:1px solid var(--border); background:var(--surface-2); color:var(--text-secondary);
+    font-size:12.5px; font-weight:600; padding:5px 11px; border-radius:100px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px; user-select:none;
+    transition:background .12s, color .12s, border-color .12s;
+  }
+  .chip:hover{border-color:var(--text-muted);}
+  .chip .dot{width:7px; height:7px; border-radius:50%; background:currentColor;}
+  .chip .dot{background:var(--text-muted);}
+  .chip.active{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+  .chip.active .dot{background:var(--accent-ink);}
+  .chip.active.starlite{background:color-mix(in srgb, var(--c-starlite) 16%, var(--surface)); border-color:var(--c-starlite); color:var(--text-primary);}
+  .chip.active.viberlink{background:color-mix(in srgb, var(--c-viberlink) 16%, var(--surface)); border-color:var(--c-viberlink); color:var(--text-primary);}
+  .chip.active.ira{background:color-mix(in srgb, var(--c-ira) 16%, var(--surface)); border-color:var(--c-ira); color:var(--text-primary);}
+  .chip.active.starlite .dot{background:var(--c-starlite);}
+  .chip.active.viberlink .dot{background:var(--c-viberlink);}
+  .chip.active.ira .dot{background:var(--c-ira);}
+  .fgroup input[type=date]{
+    font:inherit; font-size:12.5px; padding:5px 8px; border-radius:8px; border:1px solid var(--border);
+    background:var(--surface-2); color:var(--text-primary);
+  }
+  .fgroup select{
+    font:inherit; font-size:12.5px; padding:5.5px 8px; border-radius:8px; border:1px solid var(--border);
+    background:var(--surface-2); color:var(--text-primary); max-width:190px;
+  }
+  .toggle{display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--text-secondary); cursor:pointer; font-weight:600;}
+  .toggle input{accent-color:var(--accent); width:15px; height:15px;}
+  .resetbtn{
+    margin-left:auto; font:inherit; font-size:12.5px; font-weight:700; color:var(--accent);
+    background:var(--accent-soft); border:1px solid transparent; padding:7px 13px; border-radius:9px; cursor:pointer;
+  }
+  .resetbtn:hover{filter:brightness(0.97);}
+  .fdivider{width:1px; align-self:stretch; background:var(--border); margin:2px 2px;}
+
+  .kpis{display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:16px;}
+  .kpi{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 16px;
+    box-shadow:var(--shadow); display:flex; flex-direction:column; gap:5px; min-width:0;
+  }
+  .kpi .klabel{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted);}
+  .kpi .kval{font-family:"Manrope"; font-size:26px; font-weight:800; color:var(--text-primary); line-height:1.05;}
+  .kpi .ksub{font-size:11.5px; color:var(--text-secondary);}
+  .kpi .ksub b{color:var(--text-primary); font-weight:700;}
+
+  .insight{
+    background:linear-gradient(180deg, var(--accent-soft), var(--surface) 130%);
+    border:1px solid var(--border); border-left:4px solid var(--accent);
+    border-radius:12px; padding:16px 18px; margin-bottom:22px; box-shadow:var(--shadow);
+  }
+  .insight h2{font-size:14px; font-weight:800; margin-bottom:9px; color:var(--text-primary); display:flex; align-items:center; gap:8px;}
+  .insight h2 .ic{font-size:15px;}
+  .insight ul{margin:0; padding-left:19px; display:flex; flex-direction:column; gap:7px;}
+  .insight li{font-size:13px; line-height:1.55; color:var(--text-secondary);}
+  .insight li b{color:var(--text-primary);}
+  .insight li .tag{
+    display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+    padding:1px 6px; border-radius:5px; margin-right:6px; vertical-align:1px;
+  }
+  .tag.watch{background:rgba(208,59,59,.13); color:var(--crit-text);}
+  .tag.note{background:rgba(201,133,0,.15); color:var(--warn-text);}
+  .tag.good{background:rgba(12,163,12,.13); color:var(--good-text);}
+  .tag.dq{background:var(--border-soft); color:var(--text-muted);}
+
+  section{margin-bottom:20px;}
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+  .panel{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px 14px;
+    box-shadow:var(--shadow); min-width:0;
+  }
+  .panel-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:10px; flex-wrap:wrap;}
+  .panel-head h3{font-size:14.5px; font-weight:800;}
+  .panel-head .phint{font-size:11.5px; color:var(--text-muted); max-width:340px; line-height:1.4;}
+  .legend{display:flex; gap:12px; flex-wrap:wrap;}
+  .legend .litem{display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-secondary); font-weight:600;}
+  .legend .lswatch{width:10px; height:10px; border-radius:3px;}
+  .metricbtns{display:flex; gap:4px; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:3px;}
+  .metricbtns button{
+    font:inherit; font-size:11.5px; font-weight:700; border:none; background:transparent; color:var(--text-secondary);
+    padding:4px 10px; border-radius:6px; cursor:pointer;
+  }
+  .metricbtns button.active{background:var(--accent); color:var(--accent-ink);}
+
+  svg.chart{width:100%; height:auto; display:block; overflow:visible;}
+  .axis-label{fill:var(--text-muted); font-size:10.5px; font-family:"IBM Plex Sans",sans-serif;}
+  .axis-line{stroke:var(--grid-line); stroke-width:1;}
+  .grid-y{stroke:var(--grid-line); stroke-width:1; stroke-dasharray:2 3;}
+  .val-label{fill:var(--text-secondary); font-size:10.5px; font-weight:600;}
+  .val-label-strong{fill:var(--text-primary); font-size:11px; font-weight:700;}
+
+  table.datatable{width:100%; border-collapse:collapse; font-size:12.5px;}
+  table.datatable th{
+    text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted);
+    font-weight:700; padding:7px 10px; border-bottom:1px solid var(--border); white-space:nowrap;
+  }
+  table.datatable td{padding:7px 10px; border-bottom:1px solid var(--border-soft); color:var(--text-secondary); white-space:nowrap;}
+  table.datatable tr:last-child td{border-bottom:none;}
+  table.datatable td.name{color:var(--text-primary); font-weight:600;}
+  table.datatable .rank{
+    display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:6px;
+    font-size:10.5px; font-weight:800; background:var(--surface-2); color:var(--text-muted);
+  }
+  .badge{font-size:9.5px; font-weight:700; padding:1.5px 6px; border-radius:5px; text-transform:uppercase; letter-spacing:.03em;}
+  .badge.shared{background:var(--border-soft); color:var(--text-muted); margin-left:6px;}
+  .badge.co{
+    color:var(--text-primary); background:var(--surface-2); border:1px solid var(--border);
+    margin-right:6px; display:inline-flex; align-items:center; gap:5px;
+  }
+  .badge.co .cdot{width:7px; height:7px; border-radius:50%; flex-shrink:0;}
+  .rankwrap{display:flex; gap:14px; flex-wrap:wrap;}
+  .rankcol{flex:1 1 340px; min-width:300px; overflow-x:auto;}
+  .rankcol h4{font-size:12px; font-weight:800; margin-bottom:8px; color:var(--text-primary);}
+  .barcell{display:flex; align-items:center; gap:8px;}
+  .barcell .track{flex:1; height:6px; background:var(--border-soft); border-radius:4px; overflow:hidden; min-width:50px;}
+  .barcell .fill{height:100%; border-radius:4px;}
+
+  .tooltip{
+    position:fixed; pointer-events:none; z-index:200; background:var(--text-primary); color:var(--bg);
+    font-size:11.5px; padding:7px 10px; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,.22);
+    max-width:230px; line-height:1.45; transform:translate(-50%,-100%);
+  }
+  .tooltip b{display:block; margin-bottom:2px; font-weight:700;}
+  .tooltip .trow{display:flex; justify-content:space-between; gap:10px;}
+
+  .notes{
+    border-top:1px solid var(--border); padding-top:16px; margin-top:6px; font-size:11.5px; color:var(--text-muted); line-height:1.6;
+  }
+  .notes h4{font-size:11.5px; font-weight:800; color:var(--text-secondary); margin-bottom:6px; text-transform:uppercase; letter-spacing:.05em;}
+  .notes ul{margin:0 0 10px; padding-left:16px;}
+
+  .empty-msg{padding:30px 10px; text-align:center; color:var(--text-muted); font-size:12.5px;}
+
+  .loadstatus{
+    border-radius:12px; padding:12px 16px; margin-bottom:16px; font-size:13px; line-height:1.5;
+    border:1px solid var(--border);
+  }
+  .loadstatus.warn{background:rgba(250,178,25,.12); border-color:var(--warn); color:var(--warn-text);}
+  .loadstatus.error{background:rgba(208,59,59,.1); border-color:var(--crit); color:var(--crit-text);}
+
+  @media (max-width: 880px){
+    .kpis{grid-template-columns:repeat(2,1fr);}
+    .grid-2, .grid-3{grid-template-columns:1fr;}
+    .topbar{flex-direction:column; align-items:flex-start;}
+  }
+  @media (max-width: 480px){
+    .kpis{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="topbar">
+    <div>
+      <span class="eyebrow">Customer Service · Starlite · Viberlink · IRA</span>
+      <h1>Radar Layanan CS — Agustus 2026</h1>
+      <div class="sub">Kecepatan respons, waktu penyelesaian, dan beban kerja tim CS lintas tiga brand. Gunakan filter di bawah untuk menelusuri periode, brand, jenis layanan, platform, atau agent tertentu — seluruh angka menyesuaikan secara langsung.</div>
+    </div>
+    <div class="meta" id="generatedAt">Memuat data terbaru…</div>
+  </header>
+
+  <div class="filterbar" id="filterbar">
+    <div class="fgroup">
+      <label class="flabel">Rentang tanggal</label>
+      <div class="chiprow">
+        <input type="date" id="dateFrom">
+        <span style="color:var(--text-muted);font-size:12px;">–</span>
+        <input type="date" id="dateTo">
+      </div>
+    </div>
+    <div class="fdivider"></div>
+    <div class="fgroup">
+      <label class="flabel">Company</label>
+      <div class="chiprow" id="chipCompany"></div>
+    </div>
+    <div class="fdivider"></div>
+    <div class="fgroup">
+      <label class="flabel">Service type</label>
+      <div class="chiprow" id="chipService"></div>
+    </div>
+    <div class="fdivider"></div>
+    <div class="fgroup">
+      <label class="flabel">Source</label>
+      <div class="chiprow" id="chipSource"></div>
+    </div>
+    <div class="fdivider"></div>
+    <div class="fgroup">
+      <label class="flabel">Agent</label>
+      <select id="agentSelect"></select>
+    </div>
+    <div class="fdivider"></div>
+    <div class="fgroup">
+      <label class="flabel">&nbsp;</label>
+      <label class="toggle"><input type="checkbox" id="excludeOutlier"> Kecualikan outlier (RT &gt; 100 menit)</label>
+    </div>
+    <button class="resetbtn" id="resetBtn">Reset filter</button>
+  </div>
+
+  <div class="loadstatus" id="loadStatus" hidden></div>
+
+  <section class="kpis" id="kpis"></section>
+
+  <section class="insight">
+    <h2><span class="ic">💡</span> Insight Utama Bulan Ini</h2>
+    <ul id="insightList"></ul>
+  </section>
+
+  <section class="grid-2">
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h3>Tren Harian — Volume Percakapan Selesai</h3>
+          <div class="phint">Resolved conversations per hari, per company.</div>
+        </div>
+        <div class="legend" id="legendVolume"></div>
+      </div>
+      <div id="chartVolumeTrend"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h3>Tren Harian — Median Resolution Time</h3>
+          <div class="phint">Waktu penyelesaian median (menit) per hari, per company.</div>
+        </div>
+        <div class="legend" id="legendRtTrend"></div>
+      </div>
+      <div id="chartRtTrend"></div>
+    </div>
+  </section>
+
+  <section class="grid-2">
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h3>Perbandingan Kecepatan Antar Company</h3>
+          <div class="phint">Median FRT / ART / RT (menit) — makin pendek batang, makin cepat.</div>
+        </div>
+      </div>
+      <div id="chartBarCompare"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h3>Beban Kerja — Conversation Assigned</h3>
+          <div class="phint">Volume percakapan yang ditugaskan per hari (stacked per company).</div>
+        </div>
+        <div class="legend" id="legendWorkload"></div>
+      </div>
+      <div id="chartWorkload"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h3>Ringkasan per Company</h3>
+        <div class="phint">Snapshot satu layar untuk membandingkan ketiga brand secara langsung.</div>
+      </div>
+    </div>
+    <div class="grid-3" id="companyMultiples"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h3>Ranking Agent — Resolution Time</h3>
+        <div class="phint">Hanya agent individual (akun bersama/shared inbox dikecualikan agar tidak disalahartikan sebagai kinerja perorangan). Ambang minimal hari aktif menyesuaikan rentang tanggal yang dipilih agar perbandingan tetap adil.</div>
+      </div>
+    </div>
+    <div class="rankwrap">
+      <div class="rankcol">
+        <h4 style="color:var(--good-text)">⚡ Top 10 — Tercepat</h4>
+        <div id="rankTop"></div>
+      </div>
+      <div class="rankcol">
+        <h4 style="color:var(--crit-text)">🐢 Bottom 10 — Perlu Perhatian</h4>
+        <div id="rankBottom"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid-2">
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h3>Distribusi Volume per Platform</h3>
+          <div class="phint">Proporsi resolved conversations: Mekari vs Qiscus.</div>
+        </div>
+      </div>
+      <div id="chartDonut"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h3>Heatmap — Resolution Time per Tanggal × Company</h3>
+          <div class="phint">Median RT (menit) tiap hari. Warna makin gelap = makin lambat.</div>
+        </div>
+      </div>
+      <div id="chartHeatmap"></div>
+    </div>
+  </section>
+
+  <section class="grid-2">
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h3>Messages Sent vs Resolution Time</h3>
+          <div class="phint">Tiap titik = satu agent (rata-rata bulanan). Kanan-bawah = beban tinggi tapi tetap cepat.</div>
+        </div>
+        <div class="legend" id="legendScatter"></div>
+      </div>
+      <div id="chartScatter"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h3>Sebaran & Konsistensi Waktu Layanan</h3>
+          <div class="phint">Box plot per company — kotak = kuartil 25–75%, garis tengah = median.</div>
+        </div>
+        <div class="metricbtns" id="boxMetricBtns">
+          <button data-m="frt">FRT</button>
+          <button data-m="art">ART</button>
+          <button data-m="rt" class="active">RT</button>
+        </div>
+      </div>
+      <div id="chartBox"></div>
+    </div>
+  </section>
+
+  <footer class="notes" id="notes"></footer>
+
+  <div class="tooltip" id="tooltip" hidden></div>
+</div>
+<script>
+(function(){
+"use strict";
+
+/* ============================= DATA ============================= */
+// Populated by boot() once data/bundle.json has loaded — see the fetch
+// call at the bottom of this file. Nothing below may run before that.
+let DATA = [];
+let META = {};
+let INSIGHTS = [];
+
+const COMPANIES = ["Starlite","Viberlink","IRA"];
+const SERVICE_TYPES = ["FTTH","FWA"];
+const SOURCES = ["Mekari","Qiscus"];
+const COLOR = { Starlite:"var(--c-starlite)", Viberlink:"var(--c-viberlink)", IRA:"var(--c-ira)" };
+const COLOR_CLASS = { Starlite:"starlite", Viberlink:"viberlink", IRA:"ira" };
+
+let DATES = [];
+let MIN_DATE = null, MAX_DATE = null;
+
+/* ============================= UTIL ============================= */
+function median(arr){
+  if(!arr.length) return null;
+  const a = arr.slice().sort((x,y)=>x-y);
+  const mid = Math.floor(a.length/2);
+  return a.length%2 ? a[mid] : (a[mid-1]+a[mid])/2;
+}
+function mean(arr){ if(!arr.length) return null; return arr.reduce((s,v)=>s+v,0)/arr.length; }
+function quantile(arrSorted, q){
+  if(!arrSorted.length) return null;
+  const pos = (arrSorted.length-1)*q;
+  const base = Math.floor(pos), rest = pos-base;
+  if(arrSorted[base+1]!==undefined) return arrSorted[base] + rest*(arrSorted[base+1]-arrSorted[base]);
+  return arrSorted[base];
+}
+function sum(arr){ return arr.reduce((s,v)=>s+v,0); }
+function fmtInt(n){ return Math.round(n).toLocaleString("id-ID"); }
+function fmtMin1(n){ if(n==null||isNaN(n)) return "–"; return n.toFixed(1).replace(".",",")+" mnt"; }
+function fmtMinHM(n){
+  if(n==null||isNaN(n)) return "–";
+  const totalSec = Math.round(n*60);
+  const h = Math.floor(totalSec/3600), m = Math.floor((totalSec%3600)/60), s = totalSec%60;
+  if(h>0) return `${h}j ${m}m`;
+  if(m>0) return `${m}m ${s}d`;
+  return `${s}d`;
+}
+function fmtDateID(iso){
+  const d = new Date(iso+"T00:00:00");
+  return d.toLocaleDateString("id-ID",{day:"2-digit",month:"short"});
+}
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function niceStep(range, targetCount){
+  const rough = range/Math.max(targetCount,1);
+  const mag = Math.pow(10, Math.floor(Math.log10(rough||1)));
+  const norm = rough/mag;
+  let step;
+  if(norm<1.5) step=1; else if(norm<3) step=2; else if(norm<7) step=5; else step=10;
+  return step*mag;
+}
+function niceTicks(min, max, count){
+  if(min===max){ max = min+1; }
+  const step = niceStep(max-min, count) || 1;
+  const start = Math.floor(min/step)*step;
+  const ticks = [];
+  for(let v=start; v<=max+step*0.001; v+=step){ ticks.push(Math.round(v*1000)/1000); }
+  return ticks;
+}
+function scaleLinear(d0,d1,r0,r1){
+  const dd = (d1-d0)||1;
+  return v => r0 + (v-d0)/dd*(r1-r0);
+}
+
+/* ============================ TOOLTIP ============================= */
+const tipEl = document.getElementById("tooltip");
+function showTip(x,y,html){
+  tipEl.innerHTML = html;
+  tipEl.style.left = x+"px";
+  tipEl.style.top = (y-10)+"px";
+  tipEl.hidden = false;
+}
+function hideTip(){ tipEl.hidden = true; }
+function wireTip(container){
+  container.querySelectorAll("[data-tip]").forEach(el=>{
+    el.addEventListener("mousemove", e=>{ showTip(e.clientX, e.clientY, el.getAttribute("data-tip")); });
+    el.addEventListener("mouseleave", hideTip);
+  });
+}
+
+/* ============================ FILTER STATE ============================= */
+const state = {
+  from: MIN_DATE,
+  to: MAX_DATE,
+  companies: new Set(COMPANIES),
+  services: new Set(SERVICE_TYPES),
+  sources: new Set(SOURCES),
+  agent: "__ALL__",
+  excludeOutlier: false,
+  boxMetric: "rt",
+};
+const OUTLIER_THRESHOLD = 100;
+
+function getFilteredRows(){
+  return DATA.filter(r=>{
+    if(r.d < state.from || r.d > state.to) return false;
+    if(!state.companies.has(r.c)) return false;
+    if(!state.services.has(r.st)) return false;
+    if(!state.sources.has(r.src)) return false;
+    if(state.agent!=="__ALL__" && r.a!==state.agent) return false;
+    if(state.excludeOutlier && r.rt!=null && r.rt>OUTLIER_THRESHOLD) return false;
+    return true;
+  });
+}
+
+/* ============================ INIT FILTER UI ============================= */
+function initFilters(){
+  document.getElementById("dateFrom").min = MIN_DATE;
+  document.getElementById("dateFrom").max = MAX_DATE;
+  document.getElementById("dateFrom").value = MIN_DATE;
+  document.getElementById("dateTo").min = MIN_DATE;
+  document.getElementById("dateTo").max = MAX_DATE;
+  document.getElementById("dateTo").value = MAX_DATE;
+
+  const chipCompany = document.getElementById("chipCompany");
+  chipCompany.innerHTML = COMPANIES.map(c=>
+    `<span class="chip active ${COLOR_CLASS[c]}" data-v="${c}"><span class="dot"></span>${c}</span>`
+  ).join("");
+  const chipService = document.getElementById("chipService");
+  chipService.innerHTML = SERVICE_TYPES.map(s=>`<span class="chip active" data-v="${s}">${s}</span>`).join("");
+  const chipSource = document.getElementById("chipSource");
+  chipSource.innerHTML = SOURCES.map(s=>`<span class="chip active" data-v="${s}">${s}</span>`).join("");
+
+  function wireChipGroup(container, setRef){
+    container.querySelectorAll(".chip").forEach(chip=>{
+      chip.addEventListener("click", ()=>{
+        const v = chip.getAttribute("data-v");
+        if(setRef.has(v)){
+          if(setRef.size===1) return; // keep at least one active
+          setRef.delete(v); chip.classList.remove("active");
+        } else {
+          setRef.add(v); chip.classList.add("active");
+        }
+        renderAll();
+      });
+    });
+  }
+  wireChipGroup(chipCompany, state.companies);
+  wireChipGroup(chipService, state.services);
+  wireChipGroup(chipSource, state.sources);
+
+  const individualAgents = Array.from(new Set(DATA.filter(r=>!r.sh).map(r=>r.a))).sort();
+  const sharedAgents = Array.from(new Set(DATA.filter(r=>r.sh).map(r=>r.a))).sort();
+  const agentSelect = document.getElementById("agentSelect");
+  agentSelect.innerHTML =
+    `<option value="__ALL__">Semua agent</option>` +
+    `<optgroup label="Agent individual">` +
+    individualAgents.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join("") +
+    `</optgroup><optgroup label="Akun bersama / shared inbox">` +
+    sharedAgents.map(a=>`<option value="${esc(a)}">${esc(a)} 👥</option>`).join("") +
+    `</optgroup>`;
+  agentSelect.addEventListener("change", ()=>{ state.agent = agentSelect.value; renderAll(); });
+
+  document.getElementById("dateFrom").addEventListener("change", e=>{
+    state.from = e.target.value || MIN_DATE;
+    if(state.from>state.to) state.to = state.from;
+    document.getElementById("dateTo").value = state.to;
+    renderAll();
+  });
+  document.getElementById("dateTo").addEventListener("change", e=>{
+    state.to = e.target.value || MAX_DATE;
+    if(state.to<state.from) state.from = state.to;
+    document.getElementById("dateFrom").value = state.from;
+    renderAll();
+  });
+  document.getElementById("excludeOutlier").addEventListener("change", e=>{
+    state.excludeOutlier = e.target.checked; renderAll();
+  });
+  document.getElementById("resetBtn").addEventListener("click", ()=>{
+    state.from=MIN_DATE; state.to=MAX_DATE; state.companies=new Set(COMPANIES);
+    state.services=new Set(SERVICE_TYPES); state.sources=new Set(SOURCES); state.agent="__ALL__";
+    state.excludeOutlier=false;
+    document.getElementById("dateFrom").value=MIN_DATE;
+    document.getElementById("dateTo").value=MAX_DATE;
+    document.getElementById("excludeOutlier").checked=false;
+    agentSelect.value="__ALL__";
+    chipCompany.querySelectorAll(".chip").forEach(c=>c.classList.add("active"));
+    chipService.querySelectorAll(".chip").forEach(c=>c.classList.add("active"));
+    chipSource.querySelectorAll(".chip").forEach(c=>c.classList.add("active"));
+    renderAll();
+  });
+
+  document.getElementById("boxMetricBtns").querySelectorAll("button").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      state.boxMetric = btn.getAttribute("data-m");
+      document.getElementById("boxMetricBtns").querySelectorAll("button").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      renderBox(getFilteredRows());
+    });
+  });
+}
+
+
+/* ============================ KPI ============================= */
+function renderKPIs(rows){
+  const el = document.getElementById("kpis");
+  const resolved = sum(rows.map(r=>r.res||0));
+  const frtArr = rows.map(r=>r.frt).filter(v=>v!=null);
+  const artArr = rows.map(r=>r.art).filter(v=>v!=null);
+  const rtArr = rows.map(r=>r.rt).filter(v=>v!=null);
+  const msgArr = rows.map(r=>r.msg).filter(v=>v!=null);
+  const msgTotal = sum(msgArr);
+  const msgMissing = rows.length - msgArr.length;
+
+  const tiles = [
+    {label:"Resolved Conversations", val:fmtInt(resolved), sub:`dari ${rows.length.toLocaleString("id-ID")} baris agent-hari`},
+    {label:"Median FRT", val:fmtMinHM(median(frtArr)), sub:`rata-rata ${fmtMinHM(mean(frtArr))}`},
+    {label:"Median ART", val:fmtMinHM(median(artArr)), sub:`rata-rata ${fmtMinHM(mean(artArr))}`},
+    {label:"Median RT", val:fmtMinHM(median(rtArr)), sub:`rata-rata ${fmtMinHM(mean(rtArr))}`},
+    {label:"Messages Sent", val:fmtInt(msgTotal), sub: msgMissing>0 ? `${msgMissing} baris tanpa data (Qiscus/kosong)` : "seluruh baris terisi"},
+  ];
+  el.innerHTML = tiles.map(t=>`
+    <div class="kpi">
+      <div class="klabel">${t.label}</div>
+      <div class="kval tabular">${t.val}</div>
+      <div class="ksub">${t.sub}</div>
+    </div>`).join("");
+}
+
+/* ============================ INSIGHTS & NOTES ============================= */
+function renderInsights(){
+  const el = document.getElementById("insightList");
+  el.innerHTML = INSIGHTS.map(i=>`<li><span class="tag ${i.tag}">${i.tagLabel}</span>${i.html}</li>`).join("");
+}
+function renderNotes(){
+  const el = document.getElementById("notes");
+  const exBrandsList = Object.entries(META.excluded_brands).sort((a,b)=>b[1]-a[1])
+    .map(([k,v])=>`${esc(k)} (${v})`).join(", ");
+  el.innerHTML = `
+    <h4>Catatan kualitas data &amp; metodologi</h4>
+    <ul>
+      <li><b>${META.excluded_total}</b> dari <b>${META.total_raw_rows}</b> baris data mentah (${(META.excluded_total/META.total_raw_rows*100).toFixed(0)}%) berasal dari tim non-CS-brand (${exBrandsList}) dan dikecualikan dari seluruh angka di dashboard ini, karena di luar cakupan 3 brand (Starlite/Viberlink/IRA).</li>
+      <li>Kolom <code>FRT</code>/<code>ART</code>/<code>RT</code> versi angka pada sumber data ternyata ikut error mengikuti kesalahan format teks aslinya (mis. "00h 100m 52s"). Untuk ${META.malformed_count} baris bermasalah — seluruhnya dari akun bersama Viberlink Care — durasi dihitung ulang langsung dari komponen jam/menit/detik teks asli (matematis identik, hanya belum dinormalisasi), bukan memakai kolom angka yang sudah salah hitung.</li>
+      <li>Kolom <code>Source</code> memiliki variasi penulisan (${Object.entries(META.source_variants).map(([k,v])=>`"${esc(k)}": ${v}`).join(", ")}) — dinormalisasi menjadi <b>Mekari</b> / <b>Qiscus</b>.</li>
+      <li><code>messages_sent</code> kosong untuk sebagian baris (terutama Source=Qiscus) diperlakukan sebagai <i>missing value</i>, bukan nol, sehingga tidak menurunkan rata-rata secara keliru.</li>
+      <li>Metrik waktu memakai <b>median</b> sebagai angka utama karena beberapa percakapan memiliki durasi ekstrem (RT tertinggi tercatat &gt;600 menit) yang akan mendistorsi rata-rata; rata-rata tetap ditampilkan sebagai pembanding pada tiap KPI. Toggle "Kecualikan outlier" membuang baris dengan RT &gt; 100 menit dari seluruh chart.</li>
+      <li>Akun bersama/shared inbox (nama diawali "CS ..."/"HD ..." atau berpola "Viberlink Care (Nama)") disertakan dalam KPI &amp; tren agregat, tetapi <b>dikecualikan</b> dari tabel ranking performa individual agar tidak disalahartikan sebagai kinerja satu orang.</li>
+      <li>Kolom sumber "Sec" (nilai campur tanggal &amp; angka, makna tidak terdokumentasi) tidak ditampilkan di dashboard ini — perlu validasi definisi ke tim CS sebelum dipakai sebagai metrik.</li>
+    </ul>`;
+}
+
+/* ============================ SVG helpers ============================= */
+const CW = 640; // internal chart coordinate width used for all svg viewBoxes
+
+function axisYGrid(x0,x1,y0,y1,ticks,yScale,fmt){
+  return ticks.map(t=>{
+    const y = yScale(t);
+    return `<line class="grid-y" x1="${x0}" x2="${x1}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/>`+
+           `<text class="axis-label" x="${x0-6}" y="${(y+3).toFixed(1)}" text-anchor="end">${fmt(t)}</text>`;
+  }).join("");
+}
+
+/* ============================ LINE TRENDS ============================= */
+function dateRangeArr(){
+  return DATES.filter(d=>d>=state.from && d<=state.to);
+}
+function buildSeriesByCompanyDate(rows, field, aggType){
+  // returns {company: {date: value}}
+  const acc = {};
+  COMPANIES.forEach(c=>acc[c]={});
+  rows.forEach(r=>{
+    if(r[field]==null) return;
+    (acc[r.c][r.d] = acc[r.c][r.d]||[]).push(r[field]);
+  });
+  const out = {};
+  COMPANIES.forEach(c=>{
+    out[c]={};
+    Object.keys(acc[c]).forEach(d=>{
+      out[c][d] = aggType==="sum" ? sum(acc[c][d]) : median(acc[c][d]);
+    });
+  });
+  return out;
+}
+
+function renderLineChart(containerId, legendId, rows, field, aggType, yFmt, unitSuffix){
+  const dates = dateRangeArr();
+  const active = COMPANIES.filter(c=>state.companies.has(c));
+  const series = buildSeriesByCompanyDate(rows, field, aggType);
+
+  let allVals = [];
+  active.forEach(c=> dates.forEach(d=>{ const v=series[c][d]; if(v!=null) allVals.push(v); }));
+  const yMax = allVals.length ? Math.max(...allVals) : 1;
+  const ticks = niceTicks(0, yMax*1.12, 4);
+  const yTop = ticks[ticks.length-1] || 1;
+
+  const padL=44,padR=14,padT=10,padB=26;
+  const H=210;
+  const x0=padL, x1=CW-padR, y0=H-padB, y1=padT;
+  const xScale = scaleLinear(0, Math.max(dates.length-1,1), x0, x1);
+  const yScale = scaleLinear(0, yTop, y0, y1);
+
+  let svg = `<svg class="chart" viewBox="0 0 ${CW} ${H}" preserveAspectRatio="xMidYMid meet">`;
+  svg += `<line class="axis-line" x1="${x0}" x2="${x1}" y1="${y0}" y2="${y0}"/>`;
+  svg += axisYGrid(x0,x1,y0,y1,ticks,yScale,yFmt);
+
+  active.forEach(c=>{
+    const pts = dates.map((d,i)=> series[c][d]!=null ? {x:i,y:series[c][d]} : null);
+    let d="", started=false;
+    pts.forEach(p=>{
+      if(p==null){ started=false; return; }
+      d += (started?"L":"M")+xScale(p.x).toFixed(1)+","+yScale(p.y).toFixed(1)+" ";
+      started=true;
+    });
+    svg += `<path d="${d.trim()}" fill="none" style="stroke:${COLOR[c]}" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>`;
+  });
+
+  // hover columns
+  const colW = (x1-x0)/Math.max(dates.length-1,1);
+  dates.forEach((d,i)=>{
+    const cx = xScale(i);
+    const rows_ = active.map(c=>{
+      const v = series[c][d];
+      return v==null? "" : `<div class="trow"><span>${c}</span><b style="color:${COLOR[c]};margin-left:8px">${aggType==="sum"?fmtInt(v):yFmt(v)}${unitSuffix||""}</b></div>`;
+    }).join("");
+    const tip = `<b>${fmtDateID(d)}</b>${rows_||"<div>Tidak ada data</div>"}`;
+    svg += `<rect data-tip="${esc(tip)}" x="${(cx-colW/2).toFixed(1)}" y="${y1}" width="${Math.max(colW,2).toFixed(1)}" height="${(y0-y1).toFixed(1)}" fill="transparent" style="cursor:crosshair"/>`;
+  });
+
+  // x labels (every ~4th)
+  const step = Math.max(1, Math.round(dates.length/8));
+  dates.forEach((d,i)=>{
+    if(i%step!==0 && i!==dates.length-1) return;
+    svg += `<text class="axis-label" x="${xScale(i).toFixed(1)}" y="${H-8}" text-anchor="middle">${fmtDateID(d)}</text>`;
+  });
+
+  svg += `</svg>`;
+  const container = document.getElementById(containerId);
+  if(!active.length || !allVals.length){
+    container.innerHTML = `<div class="empty-msg">Tidak ada data untuk kombinasi filter ini.</div>`;
+  } else {
+    container.innerHTML = svg;
+    wireTip(container);
+  }
+
+  if(legendId){
+    document.getElementById(legendId).innerHTML = active.map(c=>
+      `<span class="litem"><span class="lswatch" style="background:${COLOR[c]}"></span>${c}</span>`).join("");
+  }
+}
+
+function renderVolumeTrend(rows){ renderLineChart("chartVolumeTrend","legendVolume", rows, "res","sum", v=>fmtInt(v), ""); }
+function renderRtTrend(rows){ renderLineChart("chartRtTrend","legendRtTrend", rows, "rt","median", v=>v.toFixed(0), " mnt"); }
+
+/* ============================ BAR COMPARE ============================= */
+function renderBarCompare(rows){
+  // Each metric gets its own scale (small multiples) — FRT/ART/RT differ by
+  // an order of magnitude, so a shared axis would make FRT bars invisible.
+  const active = COMPANIES.filter(c=>state.companies.has(c));
+  const metrics = [
+    {key:"frt", label:"FRT", desc:"First Response Time"},
+    {key:"art", label:"ART", desc:"Average Response Time"},
+    {key:"rt", label:"RT", desc:"Resolution Time"},
+  ];
+  const container = document.getElementById("chartBarCompare");
+  if(!active.length){ container.innerHTML = `<div class="empty-msg">Pilih minimal satu company.</div>`; return; }
+
+  const vals = {};
+  active.forEach(c=>{
+    vals[c] = {};
+    metrics.forEach(m=>{
+      vals[c][m.key] = median(rows.filter(r=>r.c===c).map(r=>r[m.key]).filter(v=>v!=null)) || 0;
+    });
+  });
+
+  const H=190, padL=8,padR=8,padT=10,padB=24;
+  const colW = CW/3;
+
+  let html = `<div class="legend" style="margin-bottom:8px">${active.map(c=>`<span class="litem"><span class="lswatch" style="background:${COLOR[c]}"></span>${c}</span>`).join("")}</div>`;
+  html += `<div style="display:grid;grid-template-columns:repeat(${metrics.length},1fr);gap:6px;">`;
+
+  metrics.forEach(m=>{
+    const mVals = active.map(c=>vals[c][m.key]);
+    const yMax = mVals.length? Math.max(...mVals) : 1;
+    const ticks = niceTicks(0, yMax*1.2, 3);
+    const yTop = ticks[ticks.length-1]||1;
+    const x0=padL, x1=colW-padR, y0=H-padB, y1=padT;
+    const yScale = scaleLinear(0,yTop,y0,y1);
+    const barW = Math.min(46, (x1-x0)/(active.length*1.7));
+    const bandW = (x1-x0)/active.length;
+
+    let svg = `<svg class="chart" viewBox="0 0 ${colW.toFixed(0)} ${H}">`;
+    svg += `<line class="axis-line" x1="${x0}" x2="${x1}" y1="${y0}" y2="${y0}"/>`;
+    svg += axisYGrid(x0,x1,y0,y1,ticks,yScale, v=>v.toFixed(v<3?1:0));
+    active.forEach((c,ci)=>{
+      const v = vals[c][m.key];
+      const cx = x0 + bandW*ci + bandW/2;
+      const bx = cx - barW/2;
+      const by = yScale(v);
+      const tip = `<b>${c} · ${m.label} (${m.desc})</b><div class="trow"><span>Median</span><b>${fmtMinHM(v)}</b></div>`;
+      svg += `<rect data-tip="${esc(tip)}" x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(y0-by,0).toFixed(1)}" rx="3" style="fill:${COLOR[c]}"/>`;
+      svg += `<text class="val-label-strong" x="${cx.toFixed(1)}" y="${(by-6).toFixed(1)}" text-anchor="middle">${v.toFixed(1)}</text>`;
+    });
+    svg += `<text class="axis-label" x="${((x0+x1)/2).toFixed(1)}" y="${H-6}" text-anchor="middle" font-weight="700" font-size="11.5">${m.label}</text>`;
+    svg += `</svg>`;
+    html += `<div>${svg}</div>`;
+  });
+  html += `</div>`;
+  container.innerHTML = html;
+  wireTip(container);
+}
+
+/* ============================ WORKLOAD STACKED AREA ============================= */
+function renderWorkload(rows){
+  const dates = dateRangeArr();
+  const active = COMPANIES.filter(c=>state.companies.has(c));
+  const series = buildSeriesByCompanyDate(rows, "asg", "sum");
+
+  const totals = dates.map(d=> sum(active.map(c=> series[c][d]||0)) );
+  const yMax = totals.length? Math.max(...totals) : 1;
+  const ticks = niceTicks(0, yMax*1.15, 4);
+  const yTop = ticks[ticks.length-1]||1;
+
+  const padL=44,padR=14,padT=10,padB=26,H=210;
+  const x0=padL,x1=CW-padR,y0=H-padB,y1=padT;
+  const xScale = scaleLinear(0, Math.max(dates.length-1,1), x0, x1);
+  const yScale = scaleLinear(0, yTop, y0, y1);
+
+  let svg = `<svg class="chart" viewBox="0 0 ${CW} ${H}">`;
+  svg += `<line class="axis-line" x1="${x0}" x2="${x1}" y1="${y0}" y2="${y0}"/>`;
+  svg += axisYGrid(x0,x1,y0,y1,ticks,yScale,v=>fmtInt(v));
+
+  // cumulative baselines
+  const cumBase = dates.map(()=>0);
+  active.forEach((c)=>{
+    const topPts=[], basePts=[];
+    dates.forEach((d,i)=>{
+      const v = series[c][d]||0;
+      basePts.push(cumBase[i]);
+      cumBase[i]+=v;
+      topPts.push(cumBase[i]);
+    });
+    let d = "M"+xScale(0).toFixed(1)+","+yScale(basePts[0]).toFixed(1)+" ";
+    topPts.forEach((v,i)=>{ d+= "L"+xScale(i).toFixed(1)+","+yScale(v).toFixed(1)+" "; });
+    for(let i=dates.length-1;i>=0;i--){ d+= "L"+xScale(i).toFixed(1)+","+yScale(basePts[i]).toFixed(1)+" "; }
+    d+="Z";
+    svg += `<path d="${d}" style="fill:${COLOR[c]};fill-opacity:.34;stroke:${COLOR[c]};stroke-width:1.5"/>`;
+  });
+
+  const colW = (x1-x0)/Math.max(dates.length-1,1);
+  dates.forEach((d,i)=>{
+    const cx = xScale(i);
+    const rowsHtml = active.map(c=>`<div class="trow"><span>${c}</span><b style="color:${COLOR[c]};margin-left:8px">${fmtInt(series[c][d]||0)}</b></div>`).join("");
+    const tip = `<b>${fmtDateID(d)}</b>${rowsHtml}<div class="trow"><span>Total</span><b>${fmtInt(cumBase[i]||sum(active.map(c=>series[c][d]||0)))}</b></div>`;
+    svg += `<rect data-tip="${esc(tip)}" x="${(cx-colW/2).toFixed(1)}" y="${y1}" width="${Math.max(colW,2).toFixed(1)}" height="${(y0-y1).toFixed(1)}" fill="transparent" style="cursor:crosshair"/>`;
+  });
+
+  const step = Math.max(1, Math.round(dates.length/8));
+  dates.forEach((d,i)=>{
+    if(i%step!==0 && i!==dates.length-1) return;
+    svg += `<text class="axis-label" x="${xScale(i).toFixed(1)}" y="${H-8}" text-anchor="middle">${fmtDateID(d)}</text>`;
+  });
+  svg += `</svg>`;
+
+  const container = document.getElementById("chartWorkload");
+  if(!active.length){ container.innerHTML = `<div class="empty-msg">Pilih minimal satu company.</div>`; }
+  else { container.innerHTML = svg; wireTip(container); }
+  document.getElementById("legendWorkload").innerHTML = active.map(c=>
+    `<span class="litem"><span class="lswatch" style="background:${COLOR[c]}"></span>${c}</span>`).join("");
+}
+
+
+/* ============================ COMPANY SMALL MULTIPLES ============================= */
+function renderCompanyMultiples(rows){
+  const active = COMPANIES.filter(c=>state.companies.has(c));
+  const el = document.getElementById("companyMultiples");
+  if(!active.length){ el.innerHTML = `<div class="empty-msg">Pilih minimal satu company.</div>`; return; }
+  el.innerHTML = active.map(c=>{
+    const crows = rows.filter(r=>r.c===c);
+    const resolved = sum(crows.map(r=>r.res||0));
+    const rtMed = median(crows.map(r=>r.rt).filter(v=>v!=null));
+    const frtMed = median(crows.map(r=>r.frt).filter(v=>v!=null));
+    const sharedShare = crows.length ? (crows.filter(r=>r.sh).length/crows.length*100) : 0;
+    return `
+      <div class="panel" style="box-shadow:none;border-top:3px solid ${COLOR[c]}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <span class="lswatch" style="width:11px;height:11px;border-radius:3px;background:${COLOR[c]}"></span>
+          <h3 style="font-size:15px">${c}</h3>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;">
+          <div><div class="klabel">Resolved</div><div class="kval tabular" style="font-size:19px">${fmtInt(resolved)}</div></div>
+          <div><div class="klabel">Median RT</div><div class="kval tabular" style="font-size:19px">${fmtMinHM(rtMed)}</div></div>
+          <div><div class="klabel">Median FRT</div><div class="kval tabular" style="font-size:19px">${fmtMinHM(frtMed)}</div></div>
+          <div><div class="klabel">% Akun Bersama</div><div class="kval tabular" style="font-size:19px">${sharedShare.toFixed(0)}%</div></div>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+/* ============================ RANKING TABLE ============================= */
+function renderRanking(rows){
+  const indiv = rows.filter(r=>!r.sh);
+  const byAgent = {};
+  indiv.forEach(r=>{
+    (byAgent[r.a] = byAgent[r.a]||{c:r.c, rts:[], res:0, days:new Set()}).rts.push(r.rt);
+    byAgent[r.a].res += (r.res||0);
+    byAgent[r.a].days.add(r.d);
+  });
+  const totalDays = dateRangeArr().length;
+  const minDays = Math.max(3, Math.floor(totalDays*0.35));
+  const list = Object.entries(byAgent).map(([a,o])=>({
+    agent:a, company:o.c, rtMed: median(o.rts.filter(v=>v!=null)), resolved:o.res, days:o.days.size
+  })).filter(x=> x.days>=minDays && x.rtMed!=null);
+
+  const top = list.slice().sort((a,b)=>a.rtMed-b.rtMed).slice(0,10);
+  const bottom = list.slice().sort((a,b)=>b.rtMed-a.rtMed).slice(0,10);
+  const maxRt = Math.max(...list.map(x=>x.rtMed), 1);
+
+  function tbl(items, accentGood){
+    if(!items.length) return `<div class="empty-msg">Belum cukup data (min ${minDays} hari aktif) untuk kombinasi filter ini.</div>`;
+    return `<table class="datatable"><thead><tr>
+        <th>#</th><th>Agent</th><th>Company</th><th>Median RT</th><th>Resolved</th>
+      </tr></thead><tbody>` +
+      items.map((x,i)=>`<tr>
+        <td><span class="rank">${i+1}</span></td>
+        <td class="name">${esc(x.agent)}</td>
+        <td><span class="badge co"><span class="cdot" style="background:${COLOR[x.company]}"></span>${x.company}</span></td>
+        <td class="tabular">
+          <div class="barcell">
+            <span style="min-width:56px;display:inline-block">${fmtMinHM(x.rtMed)}</span>
+            <span class="track"><span class="fill" style="width:${Math.max((x.rtMed/maxRt*100),4).toFixed(0)}%;background:${accentGood?"var(--good)":"var(--crit)"}"></span></span>
+          </div>
+        </td>
+        <td class="tabular">${fmtInt(x.resolved)}</td>
+      </tr>`).join("") + `</tbody></table>`;
+  }
+  document.getElementById("rankTop").innerHTML = tbl(top, true);
+  document.getElementById("rankBottom").innerHTML = tbl(bottom, false);
+}
+
+/* ============================ DONUT ============================= */
+function renderDonut(rows){
+  const active = SOURCES;
+  const totals = active.map(s=> sum(rows.filter(r=>r.src===s).map(r=>r.res||0)) );
+  const grand = sum(totals) || 1;
+  const COLS = {Mekari:"var(--accent)", Qiscus:"var(--c-ira)"};
+  const H=210, cx=CW*0.28, cy=H/2, rOuter=78, rInner=48;
+  let angle = -Math.PI/2;
+  let svg = `<svg class="chart" viewBox="0 0 ${CW} ${H}">`;
+  active.forEach((s,i)=>{
+    const frac = totals[i]/grand;
+    const a0 = angle, a1 = angle + frac*Math.PI*2;
+    angle = a1;
+    const large = (a1-a0) > Math.PI ? 1 : 0;
+    const x0o = cx+rOuter*Math.cos(a0), y0o = cy+rOuter*Math.sin(a0);
+    const x1o = cx+rOuter*Math.cos(a1), y1o = cy+rOuter*Math.sin(a1);
+    const x1i = cx+rInner*Math.cos(a1), y1i = cy+rInner*Math.sin(a1);
+    const x0i = cx+rInner*Math.cos(a0), y0i = cy+rInner*Math.sin(a0);
+    const d = `M${x0o.toFixed(1)},${y0o.toFixed(1)} A${rOuter},${rOuter} 0 ${large} 1 ${x1o.toFixed(1)},${y1o.toFixed(1)} L${x1i.toFixed(1)},${y1i.toFixed(1)} A${rInner},${rInner} 0 ${large} 0 ${x0i.toFixed(1)},${y0i.toFixed(1)} Z`;
+    const tip = `<b>${s}</b><div class="trow"><span>Resolved</span><b>${fmtInt(totals[i])}</b></div><div class="trow"><span>Share</span><b>${(frac*100).toFixed(1)}%</b></div>`;
+    svg += `<path data-tip="${esc(tip)}" d="${d}" style="fill:${COLS[s]}" stroke="var(--surface)" stroke-width="2"/>`;
+  });
+  svg += `<text x="${cx}" y="${cy-4}" text-anchor="middle" class="val-label-strong" font-size="17">${fmtInt(grand)}</text>`;
+  svg += `<text x="${cx}" y="${cy+13}" text-anchor="middle" class="axis-label">resolved</text>`;
+
+  const legendX = CW*0.56;
+  active.forEach((s,i)=>{
+    const y = H/2 - 22 + i*34;
+    svg += `<rect x="${legendX}" y="${y}" width="12" height="12" rx="3" style="fill:${COLS[s]}"/>`;
+    svg += `<text x="${legendX+18}" y="${y+10}" class="val-label-strong" font-size="12.5">${s}</text>`;
+    svg += `<text x="${legendX+18}" y="${y+25}" class="axis-label">${fmtInt(totals[i])} (${(totals[i]/grand*100).toFixed(0)}%)</text>`;
+  });
+  svg += `</svg>`;
+  const container = document.getElementById("chartDonut");
+  if(grand<=0){ container.innerHTML = `<div class="empty-msg">Tidak ada data.</div>`; return; }
+  container.innerHTML = svg;
+  wireTip(container);
+}
+
+/* ============================ HEATMAP ============================= */
+function renderHeatmap(rows){
+  const dates = dateRangeArr();
+  const active = COMPANIES.filter(c=>state.companies.has(c));
+  const series = buildSeriesByCompanyDate(rows, "rt", "median");
+  let allVals=[];
+  active.forEach(c=>dates.forEach(d=>{ const v=series[c][d]; if(v!=null) allVals.push(v); }));
+  const vMax = allVals.length? Math.max(...allVals) : 1;
+  const RAMP = ["#cde2fb","#9ec5f4","#5598e7","#2a78d6","#184f95"];
+  function colorFor(v){
+    if(v==null) return "var(--border-soft)";
+    const t = Math.min(v/ (vMax||1), 1);
+    const idx = Math.min(RAMP.length-1, Math.floor(t*RAMP.length));
+    return RAMP[idx];
+  }
+  const padL=68,padR=14,padT=8,padB=26;
+  const rowH = 26;
+  const H = padT+padB+active.length*rowH+4;
+  const x0=padL, x1=CW-padR;
+  const colW = (x1-x0)/dates.length;
+
+  let svg = `<svg class="chart" viewBox="0 0 ${CW} ${H}">`;
+  active.forEach((c,ri)=>{
+    const y = padT + ri*rowH;
+    svg += `<text class="axis-label" x="${padL-8}" y="${(y+rowH/2+3).toFixed(1)}" text-anchor="end" font-weight="700">${c}</text>`;
+    dates.forEach((d,ci)=>{
+      const v = series[c][d];
+      const x = x0 + ci*colW;
+      const tip = `<b>${c} · ${fmtDateID(d)}</b><div class="trow"><span>Median RT</span><b>${v==null?"–":fmtMinHM(v)}</b></div>`;
+      svg += `<rect data-tip="${esc(tip)}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(colW-1.5).toFixed(1)}" height="${rowH-3}" rx="2" fill="${colorFor(v)}"/>`;
+    });
+  });
+  const step = Math.max(1, Math.round(dates.length/10));
+  dates.forEach((d,i)=>{
+    if(i%step!==0 && i!==dates.length-1) return;
+    svg += `<text class="axis-label" x="${(x0+i*colW+colW/2).toFixed(1)}" y="${H-8}" text-anchor="middle">${fmtDateID(d)}</text>`;
+  });
+  svg += `</svg>`;
+  const container = document.getElementById("chartHeatmap");
+  if(!active.length || !allVals.length){ container.innerHTML = `<div class="empty-msg">Tidak ada data untuk kombinasi filter ini.</div>`; }
+  else { container.innerHTML = svg; wireTip(container); }
+}
+
+/* ============================ SCATTER ============================= */
+function renderScatter(rows){
+  const indiv = rows.filter(r=>!r.sh);
+  const byAgent = {};
+  indiv.forEach(r=>{
+    const o = byAgent[r.a] = byAgent[r.a]||{c:r.c, msgs:[], rts:[], res:0};
+    if(r.msg!=null) o.msgs.push(r.msg);
+    if(r.rt!=null) o.rts.push(r.rt);
+    o.res += (r.res||0);
+  });
+  const pts = Object.entries(byAgent).map(([a,o])=>({
+    agent:a, company:o.c, msgTotal:sum(o.msgs), rtMed:median(o.rts), resolved:o.res
+  })).filter(p=>p.rtMed!=null && p.msgTotal>0);
+
+  const padL=50,padR=16,padT=12,padB=30,H=260;
+  const x0=padL,x1=CW-padR,y0=H-padB,y1=padT;
+  const xMax = Math.max(...pts.map(p=>p.msgTotal), 10);
+  const yMax = Math.max(...pts.map(p=>p.rtMed), 10);
+  const xTicks = niceTicks(0, xMax*1.1, 5);
+  const yTicks = niceTicks(0, yMax*1.15, 4);
+  const xScale = scaleLinear(0, xTicks[xTicks.length-1]||1, x0, x1);
+  const yScale = scaleLinear(0, yTicks[yTicks.length-1]||1, y0, y1);
+  const maxRes = Math.max(...pts.map(p=>p.resolved),1);
+  const rScale = v => 4 + Math.sqrt(v/maxRes)*11;
+
+  let svg = `<svg class="chart" viewBox="0 0 ${CW} ${H}">`;
+  svg += `<line class="axis-line" x1="${x0}" x2="${x1}" y1="${y0}" y2="${y0}"/>`;
+  svg += `<line class="axis-line" x1="${x0}" x2="${x0}" y1="${y0}" y2="${y1}"/>`;
+  svg += axisYGrid(x0,x1,y0,y1,yTicks,yScale,v=>v.toFixed(0));
+  xTicks.forEach(t=>{
+    const x = xScale(t);
+    svg += `<text class="axis-label" x="${x.toFixed(1)}" y="${H-10}" text-anchor="middle">${fmtInt(t)}</text>`;
+  });
+  svg += `<text class="axis-label" x="${(x0+x1)/2}" y="${H-1}" text-anchor="middle">Total messages sent (bulan ini)</text>`;
+  svg += `<text class="axis-label" transform="translate(12,${(y0+y1)/2}) rotate(-90)" text-anchor="middle">Median RT (menit)</text>`;
+
+  pts.forEach(p=>{
+    const cx = xScale(p.msgTotal), cy = yScale(p.rtMed), r = rScale(p.resolved);
+    const tip = `<b>${esc(p.agent)} · ${p.company}</b><div class="trow"><span>Messages sent</span><b>${fmtInt(p.msgTotal)}</b></div><div class="trow"><span>Median RT</span><b>${fmtMinHM(p.rtMed)}</b></div><div class="trow"><span>Resolved</span><b>${fmtInt(p.resolved)}</b></div>`;
+    svg += `<circle data-tip="${esc(tip)}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" style="fill:${COLOR[p.company]};fill-opacity:.72;stroke:${COLOR[p.company]}"/>`;
+  });
+  svg += `</svg>`;
+  const container = document.getElementById("chartScatter");
+  if(!pts.length){ container.innerHTML = `<div class="empty-msg">Tidak ada agent individual dengan data messages_sent pada kombinasi filter ini.</div>`; return; }
+  container.innerHTML = svg;
+  wireTip(container);
+  document.getElementById("legendScatter").innerHTML = COMPANIES.filter(c=>state.companies.has(c)).map(c=>
+    `<span class="litem"><span class="lswatch" style="background:${COLOR[c]}"></span>${c}</span>`).join("") +
+    `<span class="litem" style="color:var(--text-muted)">Ukuran = volume resolved</span>`;
+}
+
+/* ============================ BOX PLOT ============================= */
+function renderBox(rows){
+  const metric = state.boxMetric;
+  const active = COMPANIES.filter(c=>state.companies.has(c));
+  const H=240, padL=50, padR=16, padT=14, padB=30;
+  const x0=padL, x1=CW-padR, y0=H-padB, y1=padT;
+
+  const stats = active.map(c=>{
+    const vals = rows.filter(r=>r.c===c).map(r=>r[metric]).filter(v=>v!=null).sort((a,b)=>a-b);
+    if(!vals.length) return {c, empty:true};
+    const q1=quantile(vals,.25), q2=quantile(vals,.5), q3=quantile(vals,.75);
+    const iqr=q3-q1;
+    const loFence=q1-1.5*iqr, hiFence=q3+1.5*iqr;
+    const within = vals.filter(v=>v>=loFence && v<=hiFence);
+    const lo = within.length?within[0]:vals[0];
+    const hi = within.length?within[within.length-1]:vals[vals.length-1];
+    const outliers = vals.filter(v=>v<lo || v>hi);
+    return {c, q1,q2,q3,lo,hi,outliers,n:vals.length};
+  });
+  const allVals = stats.flatMap(s=> s.empty?[]:[s.lo,s.hi,...(s.outliers||[])]);
+  const yMax = allVals.length? Math.max(...allVals) : 1;
+  const ticks = niceTicks(0, yMax*1.1, 5);
+  const yTop = ticks[ticks.length-1]||1;
+  const yScale = scaleLinear(0, yTop, y0, y1);
+
+  const bandW = (x1-x0)/Math.max(active.length,1);
+  const boxW = Math.min(60, bandW*0.42);
+
+  let svg = `<svg class="chart" viewBox="0 0 ${CW} ${H}">`;
+  svg += `<line class="axis-line" x1="${x0}" x2="${x1}" y1="${y0}" y2="${y0}"/>`;
+  svg += axisYGrid(x0,x1,y0,y1,ticks,yScale,v=>v.toFixed(0));
+
+  stats.forEach((s,i)=>{
+    const cx = x0 + bandW*i + bandW/2;
+    svg += `<text class="axis-label" x="${cx.toFixed(1)}" y="${H-10}" text-anchor="middle" font-weight="700">${s.c}</text>`;
+    if(s.empty) return;
+    const yLo=yScale(s.lo), yHi=yScale(s.hi), yQ1=yScale(s.q1), yQ3=yScale(s.q3), yQ2=yScale(s.q2);
+    const tipBox = `<b>${s.c}</b><div class="trow"><span>Q3</span><b>${fmtMinHM(s.q3)}</b></div><div class="trow"><span>Median</span><b>${fmtMinHM(s.q2)}</b></div><div class="trow"><span>Q1</span><b>${fmtMinHM(s.q1)}</b></div><div class="trow"><span>Whisker</span><b>${fmtMinHM(s.lo)}–${fmtMinHM(s.hi)}</b></div><div class="trow"><span>n</span><b>${s.n}</b></div>`;
+    svg += `<line x1="${cx.toFixed(1)}" x2="${cx.toFixed(1)}" y1="${yLo.toFixed(1)}" y2="${yHi.toFixed(1)}" style="stroke:${COLOR[s.c]}" stroke-width="1.5"/>`;
+    svg += `<line x1="${(cx-boxW*0.28).toFixed(1)}" x2="${(cx+boxW*0.28).toFixed(1)}" y1="${yLo.toFixed(1)}" y2="${yLo.toFixed(1)}" style="stroke:${COLOR[s.c]}" stroke-width="1.5"/>`;
+    svg += `<line x1="${(cx-boxW*0.28).toFixed(1)}" x2="${(cx+boxW*0.28).toFixed(1)}" y1="${yHi.toFixed(1)}" y2="${yHi.toFixed(1)}" style="stroke:${COLOR[s.c]}" stroke-width="1.5"/>`;
+    svg += `<rect data-tip="${esc(tipBox)}" x="${(cx-boxW/2).toFixed(1)}" y="${yQ3.toFixed(1)}" width="${boxW.toFixed(1)}" height="${Math.max(yQ1-yQ3,1).toFixed(1)}" rx="3" style="fill:${COLOR[s.c]};fill-opacity:.28;stroke:${COLOR[s.c]}" stroke-width="1.5"/>`;
+    svg += `<line x1="${(cx-boxW/2).toFixed(1)}" x2="${(cx+boxW/2).toFixed(1)}" y1="${yQ2.toFixed(1)}" y2="${yQ2.toFixed(1)}" style="stroke:${COLOR[s.c]}" stroke-width="2.5"/>`;
+    (s.outliers||[]).slice(0,40).forEach(v=>{
+      const oy = yScale(v);
+      svg += `<circle data-tip="${esc('<b>'+s.c+' · outlier</b><div>'+fmtMinHM(v)+'</div>')}" cx="${cx.toFixed(1)}" cy="${oy.toFixed(1)}" r="2.6" style="fill:${COLOR[s.c]};fill-opacity:.55"/>`;
+    });
+  });
+  svg += `</svg>`;
+  const container = document.getElementById("chartBox");
+  if(!active.length){ container.innerHTML = `<div class="empty-msg">Pilih minimal satu company.</div>`; return; }
+  container.innerHTML = svg;
+  wireTip(container);
+}
+
+/* ============================ MASTER RENDER ============================= */
+function renderAll(){
+  const rows = getFilteredRows();
+  renderKPIs(rows);
+  renderVolumeTrend(rows);
+  renderRtTrend(rows);
+  renderBarCompare(rows);
+  renderWorkload(rows);
+  renderCompanyMultiples(rows);
+  renderRanking(rows);
+  renderDonut(rows);
+  renderHeatmap(rows);
+  renderScatter(rows);
+  renderBox(rows);
+}
+window.renderAll = renderAll;
+window.renderBox = renderBox;
+window.getFilteredRows = getFilteredRows;
+window.state = state;
+
+/* ============================ BOOT (fetch data/bundle.json) ============================= */
+function setLoadStatus(kind, text){
+  const el = document.getElementById("loadStatus");
+  if(!el) return;
+  if(kind==="ok"){ el.hidden = true; return; }
+  el.hidden = false;
+  el.className = "loadstatus " + kind;
+  el.textContent = text;
+}
+
+function boot(bundle){
+  DATA = Array.isArray(bundle.rows) ? bundle.rows : [];
+  META = bundle.meta || {};
+  INSIGHTS = Array.isArray(bundle.insights) ? bundle.insights : [];
+  DATES = Array.from(new Set(DATA.map(r=>r.d))).sort();
+  MIN_DATE = DATES[0] || null;
+  MAX_DATE = DATES[DATES.length-1] || null;
+  state.from = MIN_DATE;
+  state.to = MAX_DATE;
+
+  const genEl = document.getElementById("generatedAt");
+  if(genEl){
+    if(bundle.generatedAt){
+      const d = new Date(bundle.generatedAt);
+      genEl.textContent = "Data diperbarui otomatis: " + d.toLocaleString("id-ID",{dateStyle:"medium",timeStyle:"short"});
+    } else {
+      genEl.textContent = "";
+    }
+  }
+
+  if(!DATA.length){
+    setLoadStatus("warn", "data/bundle.json termuat tetapi kosong — cek apakah scripts/refresh_data.py sudah pernah dijalankan (lihat tab Actions di GitHub).");
+    return;
+  }
+  setLoadStatus("ok","");
+  initFilters();
+  renderInsights();
+  renderNotes();
+  renderAll();
+}
+
+fetch("./data/bundle.json", {cache:"no-store"})
+  .then(res=>{
+    if(!res.ok) throw new Error("HTTP "+res.status+" saat mengambil data/bundle.json");
+    return res.json();
+  })
+  .then(boot)
+  .catch(err=>{
+    setLoadStatus("error",
+      "Gagal memuat data/bundle.json (" + err.message + "). " +
+      "Pastikan file ini dibuka lewat server (http://…), bukan langsung dari file lokal, " +
+      "dan GitHub Action 'Refresh dashboard data' sudah pernah berhasil jalan minimal sekali."
+    );
+  });
+
+})();
+</script>
+
+</body>
+</html>
