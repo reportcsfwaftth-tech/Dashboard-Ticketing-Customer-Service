@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Tiket CS IRA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f5f2;
+    --surface:#ffffff;
+    --surface-2:#fbfaf7;
+    --border:#e3e1da;
+    --border-soft:#ececE7;
+    --text-primary:#1b1c1a;
+    --text-secondary:#5c5d57;
+    --text-muted:#8b8c85;
+    --accent:#c1541e;
+    --accent-ink:#ffffff;
+    --accent-soft:#fbe9de;
+    --c-ira:#c1541e;
+    --c-2:#2d3557;
+    --c-3:#1baf7a;
+    --good:#0ca30c;
+    --warn:#fab219;
+    --crit:#d03b3b;
+    --good-text:#006300;
+    --warn-text:#7a4c00;
+    --crit-text:#a32020;
+    --grid-line:#e6e4dd;
+    --focus:#2a78d6;
+    --shadow: 0 1px 2px rgba(20,20,15,.04), 0 4px 14px rgba(20,20,15,.05);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#15161a; --surface:#1d1f24; --surface-2:#22242a; --border:#33353c; --border-soft:#2a2c32;
+      --text-primary:#f1f1ee; --text-secondary:#b5b6b0; --text-muted:#84867f;
+      --accent:#e2793f; --accent-ink:#181008; --accent-soft:#3a2417;
+      --c-ira:#e2793f; --c-2:#8b96c9; --c-3:#3fc79b;
+      --good:#0ca30c; --warn:#fab219; --crit:#d03b3b;
+      --good-text:#3fc23f; --warn-text:#fab219; --crit-text:#e66767;
+      --grid-line:#2e3038; --focus:#3987e5;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.35);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#15161a; --surface:#1d1f24; --surface-2:#22242a; --border:#33353c; --border-soft:#2a2c32;
+    --text-primary:#f1f1ee; --text-secondary:#b5b6b0; --text-muted:#84867f;
+    --accent:#e2793f; --accent-ink:#181008; --accent-soft:#3a2417;
+    --c-ira:#e2793f; --c-2:#8b96c9; --c-3:#3fc79b;
+    --good:#0ca30c; --warn:#fab219; --crit:#d03b3b;
+    --good-text:#3fc23f; --warn-text:#fab219; --crit-text:#e66767;
+    --grid-line:#2e3038; --focus:#3987e5;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text-primary); margin:0;}
+  .app{
+    font-family:"IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    max-width:1320px; margin:0 auto; padding-inline:20px; padding-block:18px 40px;
+  }
+  h1,h2,h3{font-family:"Manrope", system-ui, sans-serif; text-wrap:balance; margin:0;}
+  .tabular{font-variant-numeric:tabular-nums;}
+  .topbar{
+    display:flex; flex-wrap:wrap; gap:12px 24px; align-items:flex-end; justify-content:space-between;
+    padding-block:4px 18px;
+  }
+  .topbar h1{font-size:25px; font-weight:800; color:var(--text-primary); letter-spacing:-.01em;}
+  .topbar .eyebrow{font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; display:block;}
+  .topbar .sub{color:var(--text-secondary); font-size:13.5px; max-width:640px; line-height:1.5;}
+  .topbar .meta{font-size:12px; color:var(--text-muted); text-align:right; line-height:1.6;}
+
+  .loadstatus{border-radius:12px; padding:12px 16px; margin-bottom:18px; font-size:13px; line-height:1.55; border:1px solid var(--border); background:var(--surface-2);}
+  .loadstatus b{color:var(--text-primary);}
+  .loadstatus.note{background:rgba(193,84,30,.08); border-color:var(--accent);}
+  .loadstatus.error{background:rgba(208,59,59,.1); border-color:var(--crit); color:var(--crit-text);}
+
+  .kpis{display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:16px;}
+  .kpi{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 16px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:5px; min-width:0;}
+  .kpi .klabel{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted);}
+  .kpi .kval{font-family:"Manrope"; font-size:25px; font-weight:800; color:var(--text-primary); line-height:1.05;}
+  .kpi .ksub{font-size:11.5px; color:var(--text-secondary);}
+  .kpi .ksub b{color:var(--text-primary); font-weight:700;}
+  .kpi .ksub.up{color:var(--crit-text);}
+  .kpi .ksub.down{color:var(--good-text);}
+
+  .insight{background:linear-gradient(180deg, var(--accent-soft), var(--surface) 130%); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:12px; padding:16px 18px; margin-bottom:22px; box-shadow:var(--shadow);}
+  .insight h2{font-size:14px; font-weight:800; margin-bottom:9px; color:var(--text-primary); display:flex; align-items:center; gap:8px;}
+  .insight ul{margin:0; padding-left:19px; display:flex; flex-direction:column; gap:7px;}
+  .insight li{font-size:13px; line-height:1.55; color:var(--text-secondary);}
+  .insight li b{color:var(--text-primary);}
+  .insight li .tag{display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:1px 6px; border-radius:5px; margin-right:6px; vertical-align:1px;}
+  .tag.watch{background:rgba(208,59,59,.13); color:var(--crit-text);}
+  .tag.note{background:rgba(201,133,0,.15); color:var(--warn-text);}
+  .tag.good{background:rgba(12,163,12,.13); color:var(--good-text);}
+  .tag.dq{background:var(--border-soft); color:var(--text-muted);}
+
+  section{margin-bottom:20px;}
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+  .panel{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px 14px; box-shadow:var(--shadow); min-width:0;}
+  .panel-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:10px; flex-wrap:wrap;}
+  .panel-head h3{font-size:14.5px; font-weight:800;}
+  .panel-head .phint{font-size:11.5px; color:var(--text-muted); max-width:340px; line-height:1.4;}
+  .legend{display:flex; gap:12px; flex-wrap:wrap;}
+  .legend .litem{display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-secondary); font-weight:600;}
+  .legend .lswatch{width:10px; height:10px; border-radius:3px;}
+
+  svg.chart{width:100%; height:auto; display:block; overflow:visible;}
+  .axis-label{fill:var(--text-muted); font-size:10.5px; font-family:"IBM Plex Sans",sans-serif;}
+  .axis-line{stroke:var(--grid-line); stroke-width:1;}
+  .grid-y{stroke:var(--grid-line); stroke-width:1; stroke-dasharray:2 3;}
+  .val-label{fill:var(--text-secondary); font-size:10.5px; font-weight:600;}
+  .val-label-strong{fill:var(--text-primary); font-size:11px; font-weight:700;}
+
+  table.datatable{width:100%; border-collapse:collapse; font-size:12.5px;}
+  table.datatable th{text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); font-weight:700; padding:7px 10px; border-bottom:1px solid var(--border); white-space:nowrap;}
+  table.datatable td{padding:7px 10px; border-bottom:1px solid var(--border-soft); color:var(--text-secondary); white-space:nowrap;}
+  table.datatable tr:last-child td{border-bottom:none;}
+  table.datatable td.name{color:var(--text-primary); font-weight:600;}
+  table.datatable .rank{display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:6px; font-size:10.5px; font-weight:800; background:var(--surface-2); color:var(--text-muted);}
+  .badge{font-size:9.5px; font-weight:700; padding:1.5px 6px; border-radius:5px; text-transform:uppercase; letter-spacing:.03em;}
+  .badge.shared{background:var(--border-soft); color:var(--text-muted); margin-left:6px;}
+  .rankwrap{display:flex; gap:14px; flex-wrap:wrap;}
+  .rankcol{flex:1 1 340px; min-width:300px; overflow-x:auto;}
+  .rankcol h4{font-size:12px; font-weight:800; margin-bottom:8px; color:var(--text-primary);}
+  .barcell{display:flex; align-items:center; gap:8px;}
+  .barcell .track{flex:1; height:6px; background:var(--border-soft); border-radius:4px; overflow:hidden; min-width:50px;}
+  .barcell .fill{height:100%; border-radius:4px;}
+
+  .tooltip{position:fixed; pointer-events:none; z-index:200; background:var(--text-primary); color:var(--bg); font-size:11.5px; padding:7px 10px; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,.22); max-width:230px; line-height:1.45; transform:translate(-50%,-100%);}
+  .tooltip b{display:block; margin-bottom:2px; font-weight:700;}
+  .tooltip .trow{display:flex; justify-content:space-between; gap:10px;}
+
+  .notes{border-top:1px solid var(--border); padding-top:16px; margin-top:6px; font-size:11.5px; color:var(--text-muted); line-height:1.6;}
+  .notes h4{font-size:11.5px; font-weight:800; color:var(--text-secondary); margin-bottom:6px; text-transform:uppercase; letter-spacing:.05em;}
+  .notes ul{margin:0 0 10px; padding-left:16px;}
+
+  @media (max-width: 880px){
+    .kpis{grid-template-columns:repeat(2,1fr);}
+    .grid-2, .grid-3{grid-template-columns:1fr;}
+    .topbar{flex-direction:column; align-items:flex-start;}
+    .topbar .meta{text-align:left;}
+  }
+  @media (max-width: 480px){
+    .kpis{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div>
+      <span class="eyebrow">Customer Service &middot; L1 &amp; L2 &middot; IRA</span>
+      <h1>Dashboard KPI Tiket Gangguan Pelanggan</h1>
+      <div class="sub">Ringkasan performa penanganan tiket customer service (Layer 1 &amp; Layer 2) berbasis data ticketing IRA &mdash; volume, waktu penyelesaian, kategori gangguan, dan performa tim.</div>
+    </div>
+    <div class="meta">
+      Periode data: <b class="tabular" id="metaPeriode">-</b><br>
+      Snapshot per: <b class="tabular" id="metaSnapshot">-</b><br>
+      Total tiket: <b class="tabular" id="metaTotal">-</b>
+    </div>
+  </div>
+
+  <div class="loadstatus note" id="loadStatus">
+    <b>Memuat data&hellip;</b>
+  </div>
+
+  <div class="kpis" id="kpiRow"></div>
+
+  <div class="insight">
+    <h2>🔎 Insight Utama</h2>
+    <ul id="insightList"></ul>
+  </div>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h3>Tren Volume Tiket Mingguan</h3>
+        <div class="phint" id="trendHint">Jumlah tiket dibuat per minggu.</div>
+      </div>
+      <div class="legend">
+        <div class="litem"><span class="lswatch" style="background:var(--c-ira)"></span>Jumlah tiket</div>
+        <div class="litem"><span class="lswatch" style="background:var(--border-soft); border:1px dashed var(--text-muted)"></span>Minggu belum penuh</div>
+      </div>
+    </div>
+    <div id="chartTrend"></div>
+  </section>
+
+  <section class="grid-2">
+    <div class="panel">
+      <div class="panel-head">
+        <div><h3>Kategori Gangguan</h3><div class="phint">Distribusi tiket berdasarkan kategori.</div></div>
+      </div>
+      <div id="chartCategory"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div><h3>Median Waktu Penyelesaian per Kategori</h3><div class="phint">Jam, dari tiket dibuat hingga terakhir diperbarui. Rata-rata ditampilkan sebagai penanda &mdash; digunakan median karena data condong (skewed).</div></div>
+      </div>
+      <div id="chartCategoryRes"></div>
+    </div>
+  </section>
+
+  <section class="grid-3">
+    <div class="panel">
+      <div class="panel-head"><div><h3>Prioritas Tiket</h3></div></div>
+      <div id="chartPriority"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div><h3>Sumber Tiket</h3></div></div>
+      <div id="chartSource"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div><h3>Eskalasi ke</h3></div></div>
+      <div id="chartEscalation"></div>
+    </div>
+  </section>
+
+  <section class="grid-2">
+    <div class="panel">
+      <div class="panel-head"><div><h3>Sebaran Area</h3><div class="phint">Jumlah tiket per wilayah layanan.</div></div></div>
+      <div id="chartArea"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div><h3>Status Pelanggan</h3><div class="phint">Status pelanggan pada saat tiket dibuat (dinormalisasi dari input bebas).</div></div></div>
+      <div id="chartStatus"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h3>Performa Tim &mdash; Assignee (L2/NOC) &amp; Reporter (L1)</h3>
+        <div class="phint">Diurutkan berdasarkan volume tiket ditangani. Median waktu penyelesaian dihitung dari tiket yang ditangani masing-masing orang. Akun bersama/generik dikecualikan agar peringkat individu adil.</div>
+      </div>
+    </div>
+    <div class="rankwrap">
+      <div class="rankcol">
+        <h4>Assignee (Penyelesai / L2 &amp; NOC)</h4>
+        <table class="datatable" id="tblAssignee"></table>
+      </div>
+      <div class="rankcol">
+        <h4>Reporter (Pelapor / L1)</h4>
+        <table class="datatable" id="tblReporter"></table>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div><h3>Top 10 Distributor / Mitra</h3><div class="phint">Distributor dengan jumlah tiket terbanyak. Kolom &ldquo;Tidak diisi&rdquo; berarti data distributor kosong pada tiket tersebut.</div></div>
+    </div>
+    <div id="chartDistributor"></div>
+  </section>
+
+  <div class="notes">
+    <h4>Tentang Pembaruan Data (Live Update)</h4>
+    <ul>
+      <li>Dashboard ini memuat <code>data/bundle.json</code> setiap kali halaman dibuka &mdash; file itu di-refresh otomatis oleh GitHub Actions (lihat jadwal &amp; cara kerja di <code>README.md</code> repo ini) yang menarik ulang data dari &ldquo;Publish to web&rdquo; CSV Google Sheet, membersihkannya, dan meng-commit hasilnya kembali ke repo.</li>
+      <li>Karena itu ada jeda antara perubahan di spreadsheet dan tampil di sini, sebesar jadwal refresh yang diatur (default tiap 6 jam) &mdash; bukan live per-detik. Bisa dipicu manual kapan saja lewat tab <b>Actions</b> &rarr; <b>Run workflow</b>.</li>
+      <li>Waktu &ldquo;Data terakhir diperbarui&rdquo; di atas diambil dari timestamp commit refresh terakhir, bukan waktu halaman ini dibuka.</li>
+    </ul>
+    <h4>Catatan Kualitas Data &amp; Metodologi</h4>
+    <ul>
+      <li>Waktu penyelesaian dihitung sebagai selisih <i>Updated At</i> &minus; <i>Created At</i> (jam). Kolom mentah <i>SLA Target</i> dan <i>Resolution Time</i> pada sheet sumber tidak konsisten terisi sehingga tidak digunakan.</li>
+      <li>Median digunakan sebagai ukuran utama waktu penyelesaian karena distribusinya cenderung condong (mean bisa jauh lebih tinggi dari median akibat sejumlah kecil tiket dengan durasi sangat panjang).</li>
+      <li>Kolom <i>Source</i> dan <i>Ticket Priority</i> yang kosong ditampilkan sebagai kategori &ldquo;Tidak diisi&rdquo;, bukan diasumsikan atau disembunyikan.</li>
+      <li>Akun bersama &ldquo;Helpdesk NOC&rdquo; dan &ldquo;CS IRA LB Satu&rdquo; dikecualikan dari peringkat individu karena mewakili banyak orang/antrean bersama, bukan satu agen.</li>
+      <li>Nilai &ldquo;Status Pelanggan&rdquo; dinormalisasi dari input bebas (variasi huruf besar/kecil, typo, prefix &ldquo;Status:&rdquo;) ke kategori standar oleh <code>scripts/refresh_data.py</code>.</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+function fmt(n, d=0){ return Number(n).toLocaleString('id-ID', {minimumFractionDigits:d, maximumFractionDigits:d}); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fmtDate(iso){
+  if(!iso) return '-';
+  const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  const [y,m,d] = iso.split('-').map(Number);
+  return d + ' ' + bulan[m-1] + ' ' + y;
+}
+function fmtDateTime(iso){
+  if(!iso) return '-';
+  try{
+    const dt = new Date(iso);
+    return dt.toLocaleString('id-ID', {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', timeZone:'Asia/Jakarta'}) + ' WIB';
+  }catch(e){ return iso; }
+}
+
+function render(DATA){
+document.getElementById('metaPeriode').textContent = fmtDate(DATA.meta.date_start) + ' – ' + fmtDate(DATA.meta.date_end);
+document.getElementById('metaSnapshot').textContent = fmtDate(DATA.meta.generated_at);
+document.getElementById('metaTotal').textContent = fmt(DATA.meta.total_tickets) + ' tiket';
+document.getElementById('trendHint').textContent = `Jumlah tiket dibuat per minggu, periode ${fmtDate(DATA.meta.date_start)} – ${fmtDate(DATA.meta.date_end)}.`;
+
+const statusEl = document.getElementById('loadStatus');
+statusEl.innerHTML = `<b>Tentang data ini:</b> Dashboard ini otomatis mengambil ulang data dari Google Sheet sumber secara berkala lewat GitHub Actions (lihat <code>data/bundle.json</code>). Data terakhir diperbarui: <b>${fmtDateTime(DATA.generatedAt)}</b>. Ini <b>bukan</b> koneksi live per-detik &mdash; ada jeda sesuai jadwal refresh (lihat README repo ini untuk mengubah jadwalnya).`;
+
+// ---------- KPI cards ----------
+(function(){
+  const ov = DATA.resolution.overall;
+  const mom = DATA.month_over_month;
+  let momHtml = '';
+  if(mom.length >= 2){
+    const a = mom[mom.length-2], b = mom[mom.length-1];
+    const delta = ((b.median_h - a.median_h)/a.median_h*100);
+    const dir = delta >= 0 ? 'up' : 'down';
+    const arrow = delta >= 0 ? '↑' : '↓';
+    momHtml = `<div class="ksub ${dir}">${arrow} ${fmt(Math.abs(delta),0)}% vs bulan sebelumnya</div>`;
+  }
+  const kpis = [
+    {label:'Total Tiket', val: fmt(DATA.meta.total_tickets), sub:`${fmtDate(DATA.meta.date_start)} – ${fmtDate(DATA.meta.date_end)}`},
+    {label:'Median Waktu Selesai', val: fmt(ov.median_h,1)+' jam', sub: momHtml || `n=${fmt(ov.n)} tiket`, raw:true},
+    {label:'Rata-rata (Mean)', val: fmt(ov.mean_h,1)+' jam', sub:'lebih tinggi dari median &mdash; ada tiket outlier lama', raw:true},
+    {label:'P90 Waktu Selesai', val: fmt(ov.p90_h,1)+' jam', sub:'90% tiket selesai di bawah nilai ini'},
+    {label:'Tiket Tanpa Prioritas', val: fmt(DATA.dist.priority.find(x=>x.label==='Tidak diisi')?.pct||0,1)+'%', sub:'kolom Ticket Priority kosong'},
+  ];
+  document.getElementById('kpiRow').innerHTML = kpis.map(k=>`
+    <div class="kpi">
+      <div class="klabel">${k.label}</div>
+      <div class="kval tabular">${k.val}</div>
+      <div class="${k.raw?'':'ksub'}">${k.sub}</div>
+    </div>`).join('');
+})();
+
+// ---------- Insights ----------
+(function(){
+  const ov = DATA.resolution.overall;
+  const mom = DATA.month_over_month;
+  const cat = DATA.dist.category;
+  const catRes = DATA.resolution.by_category;
+  const top = cat[0];
+  const slowest = [...catRes].sort((a,b)=>b.median_h-a.median_h)[0];
+  const fastest = [...catRes].sort((a,b)=>a.median_h-b.median_h)[0];
+  const items = [];
+
+  items.push(`<li><span class="tag note">Volume</span><b>${esc(top.label)}</b> mendominasi dengan <b>${top.pct}%</b> dari seluruh tiket (${fmt(top.count)} tiket) &mdash; jauh di atas kategori lain.</li>`);
+
+  if(mom.length>=2){
+    const a=mom[mom.length-2], b=mom[mom.length-1];
+    const delta = ((b.median_h-a.median_h)/a.median_h*100);
+    const tag = delta>0 ? 'watch' : 'good';
+    const word = delta>0 ? 'memburuk' : 'membaik';
+    items.push(`<li><span class="tag ${tag}">Tren</span>Median waktu penyelesaian <b>${word} ${fmt(Math.abs(delta),0)}%</b>, dari <b>${fmt(a.median_h,1)} jam</b> (${a.month.slice(5)==='07'?'Juli':'Agustus'}) menjadi <b>${fmt(b.median_h,1)} jam</b> (${b.month.slice(5)==='07'?'Juli':'Agustus'}), meski volume tiket relatif stabil (${fmt(a.count)} &rarr; ${fmt(b.count)}).</li>`);
+  }
+
+  items.push(`<li><span class="tag watch">Perhatian</span>Kategori <b>${esc(slowest.label)}</b> punya median penyelesaian paling lama (<b>${fmt(slowest.median_h,1)} jam</b>), jauh di atas <b>${esc(fastest.label)}</b> (<b>${fmt(fastest.median_h,1)} jam</b>) yang notabene kategori dengan volume terbesar.</li>`);
+
+  const noSrc = DATA.dist.source.find(x=>x.label==='Tidak diisi');
+  const noPri = DATA.dist.priority.find(x=>x.label==='Tidak diisi');
+  items.push(`<li><span class="tag dq">Kualitas Data</span>Kolom <b>Source</b> kosong pada <b>${noSrc?noSrc.pct:0}%</b> tiket dan <b>Ticket Priority</b> kosong pada <b>${noPri?noPri.pct:0}%</b> tiket &mdash; ditampilkan sebagai &ldquo;Tidak diisi&rdquo;, perlu pembenahan input di sisi tim lapangan.</li>`);
+
+  items.push(`<li><span class="tag good">Metodologi</span>Akun bersama (<b>${DATA.leaderboards.excluded_assignee_names.join(', ')}</b>) dikecualikan dari peringkat individu Assignee agar tidak menyamarkan performa agen sesungguhnya.</li>`);
+
+  document.getElementById('insightList').innerHTML = items.join('');
+})();
+
+// ---------- SVG helpers ----------
+function hBarChart(container, items, opts={}){
+  const W = 600, rowH = 26, gap = 8, labelW = opts.labelW || 190, valW = 56;
+  const H = items.length*(rowH+gap)-gap + 8;
+  const max = Math.max(...items.map(d=>d.count), 1);
+  const barAreaW = W - labelW - valW - 10;
+  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
+  const maxChars = Math.max(Math.floor(labelW/7.1), 10);
+  items.forEach((d,i)=>{
+    const y = i*(rowH+gap);
+    const w = Math.max((d.count/max)*barAreaW, 2);
+    const color = opts.color ? (typeof opts.color==='function'?opts.color(d,i):opts.color) : 'var(--c-ira)';
+    svg += `<text x="0" y="${y+rowH/2+4}" class="val-label" style="fill:var(--text-primary); font-weight:600;">${esc(d.label.length>maxChars?d.label.slice(0,maxChars-1)+'…':d.label)}</text>`;
+    svg += `<rect x="${labelW}" y="${y+3}" width="${barAreaW}" height="${rowH-6}" rx="5" fill="var(--border-soft)"></rect>`;
+    svg += `<rect x="${labelW}" y="${y+3}" width="${w}" height="${rowH-6}" rx="5" fill="${color}"></rect>`;
+    const valTxt = opts.valueFmt ? opts.valueFmt(d) : (fmt(d.count) + (d.pct!==undefined?` (${d.pct}%)`:''));
+    svg += `<text x="${labelW+barAreaW+8}" y="${y+rowH/2+4}" class="val-label-strong">${valTxt}</text>`;
+  });
+  svg += `</svg>`;
+  container.innerHTML = svg;
+}
+
+function weeklyTrendChart(container, weeks){
+  const W = 900, H = 220, padL = 34, padB = 26, padT = 10, padR = 10;
+  const max = Math.max(...weeks.map(d=>d.count),1);
+  const plotW = W-padL-padR, plotH = H-padT-padB;
+  const bw = plotW/weeks.length*0.62;
+  const step = plotW/weeks.length;
+  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}">`;
+  // gridlines
+  const ticks = 4;
+  for(let t=0;t<=ticks;t++){
+    const val = max/ticks*t;
+    const y = padT+plotH-(val/max)*plotH;
+    svg += `<line x1="${padL}" x2="${W-padR}" y1="${y}" y2="${y}" class="grid-y"/>`;
+    svg += `<text x="${padL-6}" y="${y+3}" text-anchor="end" class="axis-label">${fmt(val,0)}</text>`;
+  }
+  weeks.forEach((d,i)=>{
+    const x = padL + i*step + (step-bw)/2;
+    const h = (d.count/max)*plotH;
+    const y = padT+plotH-h;
+    const fill = d.partial ? 'var(--border-soft)' : 'var(--c-ira)';
+    const stroke = d.partial ? 'var(--text-muted)' : 'none';
+    svg += `<rect x="${x}" y="${y}" width="${bw}" height="${h}" rx="4" fill="${fill}" ${d.partial?'stroke="var(--text-muted)" stroke-dasharray="3 2"':''}></rect>`;
+    svg += `<text x="${x+bw/2}" y="${y-6}" text-anchor="middle" class="val-label">${d.count}</text>`;
+    const wkLabel = 'W'+d.week.split('W')[1];
+    svg += `<text x="${x+bw/2}" y="${H-8}" text-anchor="middle" class="axis-label">${wkLabel}</text>`;
+  });
+  svg += `<line x1="${padL}" x2="${W-padR}" y1="${padT+plotH}" y2="${padT+plotH}" class="axis-line"/>`;
+  svg += `</svg>`;
+  container.innerHTML = svg;
+}
+
+function catResChart(container, items){
+  const W = 600, rowH=26, gap=8, labelW=150, valW=110;
+  const H = items.length*(rowH+gap)-gap+8;
+  const max = Math.max(...items.map(d=>d.mean_h), 1);
+  const barAreaW = W-labelW-valW-10;
+  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}">`;
+  items.forEach((d,i)=>{
+    const y = i*(rowH+gap);
+    const wMed = Math.max((d.median_h/max)*barAreaW,2);
+    const wMean = Math.max((d.mean_h/max)*barAreaW,2);
+    svg += `<text x="0" y="${y+rowH/2+4}" class="val-label" style="fill:var(--text-primary); font-weight:600;">${esc(d.label.length>20?d.label.slice(0,19)+'…':d.label)}</text>`;
+    svg += `<rect x="${labelW}" y="${y+3}" width="${barAreaW}" height="${rowH-6}" rx="5" fill="var(--border-soft)"></rect>`;
+    svg += `<rect x="${labelW}" y="${y+3}" width="${wMean}" height="${rowH-6}" rx="5" fill="var(--border)" opacity="0.7"></rect>`;
+    svg += `<rect x="${labelW}" y="${y+3}" width="${wMed}" height="${rowH-6}" rx="5" fill="var(--c-ira)"></rect>`;
+    svg += `<text x="${labelW+barAreaW+8}" y="${y+rowH/2+4}" class="val-label-strong">${fmt(d.median_h,1)}j (rt2 ${fmt(d.mean_h,0)}j)</text>`;
+  });
+  svg += `</svg>`;
+  container.innerHTML = svg;
+}
+
+weeklyTrendChart(document.getElementById('chartTrend'), DATA.weekly_trend);
+hBarChart(document.getElementById('chartCategory'), DATA.dist.category, {labelW:170});
+catResChart(document.getElementById('chartCategoryRes'), DATA.resolution.by_category);
+hBarChart(document.getElementById('chartPriority'), DATA.dist.priority, {labelW:110, color:'var(--c-2)'});
+hBarChart(document.getElementById('chartSource'), DATA.dist.source, {labelW:110, color:'var(--c-3)'});
+hBarChart(document.getElementById('chartEscalation'), DATA.dist.escalation_to, {labelW:110, color:'var(--accent)'});
+hBarChart(document.getElementById('chartArea'), DATA.dist.area, {labelW:150});
+hBarChart(document.getElementById('chartStatus'), DATA.dist.status_pelanggan, {labelW:170, color:'var(--c-2)'});
+hBarChart(document.getElementById('chartDistributor'), DATA.distributor_top, {labelW:280, valW:80});
+renderBoard(document.getElementById('tblAssignee'), DATA.leaderboards.assignee, DATA.leaderboards.excluded_assignee_names);
+renderBoard(document.getElementById('tblReporter'), DATA.leaderboards.reporter, DATA.leaderboards.excluded_reporter_names);
+} // end render()
+
+// ---------- Leaderboard tables ----------
+function renderBoard(el, board, exclNames){
+  const max = Math.max(...board.map(b=>b.count),1);
+  let html = `<thead><tr><th>#</th><th>Nama</th><th>Tiket</th><th>Median</th><th>Rata-rata</th></tr></thead><tbody>`;
+  board.forEach((b,i)=>{
+    const w = (b.count/max*100).toFixed(0);
+    html += `<tr>
+      <td><span class="rank">${i+1}</span></td>
+      <td class="name">${esc(b.name)}</td>
+      <td class="tabular"><div class="barcell"><div class="track"><div class="fill" style="width:${w}%; background:var(--c-ira);"></div></div><span>${fmt(b.count)}</span></div></td>
+      <td class="tabular">${b.median_h!==null?fmt(b.median_h,1)+'j':'-'}</td>
+      <td class="tabular">${b.mean_h!==null?fmt(b.mean_h,1)+'j':'-'}</td>
+    </tr>`;
+  });
+  html += `</tbody>`;
+  if(exclNames && exclNames.length){
+    html += `<tfoot><tr><td colspan="5" style="border-bottom:none; padding-top:10px; font-size:11px; color:var(--text-muted);">Dikecualikan (akun bersama): ${exclNames.map(n=>esc(n)).join(', ')} <span class="badge shared">shared</span></td></tr></tfoot>`;
+  }
+  el.innerHTML = html;
+}
+
+// ---------- Bootstrap: fetch the data bundle GitHub Actions keeps refreshed ----------
+fetch('./data/bundle.json', {cache: 'no-store'})
+  .then(res => { if(!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+  .then(data => render(data))
+  .catch(err => {
+    document.getElementById('loadStatus').outerHTML = `<div class="loadstatus error"><b>Gagal memuat data/bundle.json:</b> ${esc(err.message)}. Pastikan file ini ada di repo dan workflow refresh sudah pernah berhasil jalan minimal sekali (tab Actions &rarr; Run workflow).</div>`;
+    console.error(err);
+  });
+</script>
+</body>
+</html>
